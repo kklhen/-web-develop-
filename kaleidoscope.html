@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>宇宙万花筒</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            window.addEventListener('resize', init);
+        }
+
+        // DNA粒子参数
+        const dnaParticles = [];
+        // 修改DNA粒子数量为120（原为60）
+        const particlesPerStrand = 120;
+        
+        // 初始化DNA粒子
+        for (let i = 0; i < particlesPerStrand; i++) {
+            dnaParticles.push({
+                angle: Math.random() * Math.PI * 2,
+                speed: 0.01 + Math.random() * 0.02,
+                size: 2 + Math.random() * 2
+            });
+        }
+
+        // 星盘参数
+        const starDiskPoints = [];
+        const starDiskRings = 5;
+        const starDiskPointsPerRing = 24;
+        
+        // 初始化星盘点
+        for (let r = 0; r < starDiskRings; r++) {
+            for (let i = 0; i < starDiskPointsPerRing; i++) {
+                starDiskPoints.push({
+                    ring: r,
+                    angle: (i / starDiskPointsPerRing) * Math.PI * 2,
+                    size: 1 + Math.random() * 2,
+                    speed: 0.005 + r * 0.003
+                });
+            }
+        }
+
+        let time = 0;
+        let rotation = 0;
+
+        function draw() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.8;
+            
+            time += 0.01;
+            rotation += 0.003;
+            
+            // 清除画布
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制黑白黑洞
+            drawBlackHole(centerX, centerY, size);
+            
+            // 绘制星盘
+            drawStarDisk(centerX, centerY, size);
+            
+            // 绘制DNA螺旋
+            drawDNASpiral(centerX, centerY, size);
+            
+            requestAnimationFrame(draw);
+        }
+
+        function drawBlackHole(x, y, size) {
+            // 黑洞吸积盘
+            const gradient = ctx.createRadialGradient(
+                x, y, size * 0.1,
+                x, y, size * 0.4
+            );
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+            gradient.addColorStop(0.5, 'rgba(100, 100, 100, 0.8)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 事件视界
+            const horizonGradient = ctx.createRadialGradient(
+                x, y, size * 0.05,
+                x, y, size * 0.15
+            );
+            horizonGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+            horizonGradient.addColorStop(1, 'rgba(255, 255, 255, 0.7)');
+            
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = horizonGradient;
+            ctx.fill();
+            
+            // 中心奇点
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.03, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fill();
+            
+            // 添加引力场线条
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // 绘制12条引力线
+            const lines = 12;
+            for(let i = 0; i < lines; i++) {
+                const angle = (i / lines) * Math.PI * 2 + rotation * 0.5;
+                const length = size * (0.4 + 0.1 * Math.sin(time * 2 + i));
+                
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(
+                    Math.cos(angle) * length,
+                    Math.sin(angle) * length
+                );
+                
+                // 创建渐变线条
+                const lineGradient = ctx.createLinearGradient(0, 0, 
+                    Math.cos(angle) * length, 
+                    Math.sin(angle) * length);
+                lineGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                lineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                
+                ctx.strokeStyle = lineGradient;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        function drawStarDisk(x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation * 1.2);  // 加快旋转速度（原为0.5）
+            
+            // 星盘背景光晕
+            const glowGradient = ctx.createRadialGradient(
+                0, 0, size * 0.1,
+                0, 0, size * 0.5
+            );
+            glowGradient.addColorStop(0, 'rgba(100, 100, 255, 0.2)');
+            glowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = glowGradient;
+            ctx.fill();
+            
+            // 绘制星盘环
+            starDiskPoints.forEach(point => {
+                point.angle += point.speed;
+                
+                const radius = size * (0.15 + 0.2 * (point.ring / starDiskRings));
+                const xPos = Math.cos(point.angle) * radius;
+                const yPos = Math.sin(point.angle) * radius;
+                
+                // 绘制星点
+                ctx.beginPath();
+                ctx.arc(xPos, yPos, point.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fill();
+                
+                // 绘制连接线
+                if(point.angle > 0) {
+                    const prevAngle = point.angle - point.speed;
+                    const prevX = Math.cos(prevAngle) * radius;
+                    const prevY = Math.sin(prevAngle) * radius;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(prevX, prevY);
+                    ctx.lineTo(xPos, yPos);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            });
+            
+            ctx.restore();
+        }
+
+        function drawDNASpiral(x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation * 1.5);
+            
+            const spiralRadius = size * 0.25;  // 增加螺旋半径
+            const spiralHeight = size * 1.5;  // 增加螺旋高度
+            const twist = Math.PI * 8;  // 增加螺旋扭曲度
+            
+            // 存储前一帧的粒子位置
+            let prevX1, prevX2, prevY1, prevY2;
+            
+            dnaParticles.forEach((p, i) => {
+                p.angle += p.speed * 2;  // 进一步加快粒子运动速度
+                const t = i / particlesPerStrand;
+                const angle = p.angle + t * twist + time * 1.5;  // 增加时间影响
+                
+                // 两条链的位置（带轻微3D效果）
+                const x1 = Math.cos(angle) * spiralRadius * (0.9 + 0.1 * Math.sin(time + t));
+                const x2 = -Math.cos(angle) * spiralRadius * (0.9 + 0.1 * Math.cos(time + t));
+                const yPos = t * spiralHeight - spiralHeight / 2;
+                const z = Math.sin(angle) * spiralRadius * 0.3;  // 恢复轻微3D效果
+                
+                // 3D投影（带深度效果）
+                const scale = 0.8 + 0.2 * (1 - z / (spiralRadius * 2));
+                const projX1 = x1 * scale;
+                const projX2 = x2 * scale;
+                const projY = yPos * scale;
+                
+                // 绘制连接线（带动态宽度）
+                if(i > 0) {
+                    // 链1的连接线
+                    ctx.beginPath();
+                    ctx.moveTo(prevX1, prevY1);
+                    ctx.lineTo(projX1, projY);
+                    ctx.strokeStyle = `rgba(100, 200, 255, ${0.4 + 0.3 * Math.sin(time + i * 0.1)})`;
+                    ctx.lineWidth = 1 + Math.sin(time + i * 0.1);
+                    ctx.stroke();
+                    
+                    // 链2的连接线
+                    ctx.beginPath();
+                    ctx.moveTo(prevX2, prevY2);
+                    ctx.lineTo(projX2, projY);
+                    ctx.strokeStyle = `rgba(255, 100, 200, ${0.4 + 0.3 * Math.cos(time + i * 0.1)})`;
+                    ctx.lineWidth = 1 + Math.cos(time + i * 0.1);
+                    ctx.stroke();
+                }
+                
+                // 绘制粒子（带发光效果）
+                const glow1 = ctx.createRadialGradient(projX1, projY, 0, projX1, projY, p.size * 1.5);
+                glow1.addColorStop(0, `rgba(100, 200, 255, 0.9)`);
+                glow1.addColorStop(1, `rgba(100, 200, 255, 0.2)`);
+                
+                const glow2 = ctx.createRadialGradient(projX2, projY, 0, projX2, projY, p.size * 1.5);
+                glow2.addColorStop(0, `rgba(255, 100, 200, 0.9)`);
+                glow2.addColorStop(1, `rgba(255, 100, 200, 0.2)`);
+                
+                // 第一条链
+                ctx.beginPath();
+                ctx.arc(projX1, projY, p.size * 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = glow1;
+                ctx.fill();
+                
+                // 第二条链
+                ctx.beginPath();
+                ctx.arc(projX2, projY, p.size * 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = glow2;
+                ctx.fill();
+                
+                // 保存当前点位置
+                prevX1 = projX1;
+                prevX2 = projX2;
+                prevY1 = prevY2 = projY;
+            });
+            
+            ctx.restore();
+        }
+
+        init();
+        draw();
+    </script>
+</body>
+</html>

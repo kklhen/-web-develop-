@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双星环绕系统</title>
+    <style>
+        body {
+            background-color: black;
+            overflow: hidden;
+            margin: 0;
+        }
+        
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #fff;
+        }
+        
+        #star1 {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #ffde00, #ff8c00);
+        }
+        
+        #star2 {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #00bfff, #0066cc);
+        }
+
+        #star3 {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #FF69B4, #8B008B);
+            box-shadow: 0 0 15px #FF69B4;
+        }
+
+        #earth {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #1E90FF, #006400);
+            box-shadow: 0 0 10px #1E90FF;
+        }
+
+        .earth-orbit {
+            position: absolute;
+            border: 1px dashed rgba(0, 255, 0, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .orbit {
+            position: absolute;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* 新增行星样式 */
+        #sun {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #ffff00, #ff8c00);
+            box-shadow: 0 0 80px #ffff00;
+        }
+        
+        #mercury { width: 8px; height: 8px; background: #a9a9a9; }
+        #venus { width: 14px; height: 14px; background: #e6c229; }
+        #earth { width: 15px; height: 15px; background: #1E90FF; }
+        #mars { width: 10px; height: 10px; background: #ff6347; }
+        #jupiter { width: 30px; height: 30px; background: #e3b04b; }
+        #saturn { width: 25px; height: 25px; background: #d9a441; }
+        #uranus { width: 18px; height: 18px; background: #7ec0ee; }
+        #neptune { width: 17px; height: 17px; background: #4682b4; }
+
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+        }
+        
+        #mercury {
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #a9a9a9, #696969);
+        }
+        
+        #venus {
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, #ffa07a, #cd853f);
+        }
+        
+        #earth {
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, #1E90FF, #006400);
+        }
+        
+        #mars {
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, #ff6347, #8b0000);
+        }
+    </style>
+</head>
+<body>
+    <div class="orbit" id="orbit"></div>
+    <div class="earth-orbit" id="earthOrbit"></div>
+    <div class="star" id="star1"></div>
+    <div class="star" id="star2"></div>
+    <div class="star" id="star3"></div>
+    <div class="star" id="earth"></div>
+
+    <script>
+        const star1 = document.getElementById('star1');
+        const star2 = document.getElementById('star2');
+        const star3 = document.getElementById('star3');
+        const earth = document.getElementById('earth');
+        const orbit = document.getElementById('orbit');
+        const earthOrbit = document.getElementById('earthOrbit');
+        
+        // 系统参数
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        let radius1 = 120, radius2 = 150, radius3 = 180; // 每颗恒星不同轨道半径
+        const earthRadius = 300;
+        let speed1 = 0.008, speed2 = 0.012, speed3 = 0.01; // 不同速度
+        const earthSpeed = 0.005;
+        let angle1 = 0, angle2 = Math.PI/2, angle3 = Math.PI; // 不同起始角度
+        let earthAngle = 0;
+        
+        // 移除固定轨道显示
+        orbit.style.display = 'none';
+        
+        function animate() {
+            // 混沌运动 - 随机改变轨道参数
+            if(Math.random() < 0.01) {
+                radius1 = 100 + Math.random() * 100;
+                radius2 = 100 + Math.random() * 100;
+                radius3 = 100 + Math.random() * 100;
+                speed1 = 0.005 + Math.random() * 0.01;
+                speed2 = 0.005 + Math.random() * 0.01;
+                speed3 = 0.005 + Math.random() * 0.01;
+            }
+            
+            // 计算三颗恒星的位置 (混沌轨道)
+            const x1 = centerX + Math.cos(angle1) * radius1;
+            const y1 = centerY + Math.sin(angle1) * radius1;
+            const x2 = centerX + Math.cos(angle2) * radius2;
+            const y2 = centerY + Math.sin(angle2) * radius2;
+            const x3 = centerX + Math.cos(angle3) * radius3;
+            const y3 = centerY + Math.sin(angle3) * radius3;
+            
+            // 计算地球位置保持不变...
+            
+            // 更新恒星位置
+            star1.style.left = `${x1 - 30}px`;
+            star1.style.top = `${y1 - 30}px`;
+            star2.style.left = `${x2 - 20}px`;
+            star2.style.top = `${y2 - 20}px`;
+            star3.style.left = `${x3 - 25}px`;
+            star3.style.top = `${y3 - 25}px`;
+            
+            angle1 += speed1;
+            angle2 += speed2;
+            angle3 += speed3;
+            earthAngle += earthSpeed;
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    </script>
+</body>
+<body>
+    <div id="sun"></div>
+    <div class="planet" id="mercury"></div>
+    <div class="planet" id="venus"></div>
+    <div class="planet" id="earth"></div>
+    <div class="planet" id="mars"></div>
+    <div class="planet" id="jupiter"></div>
+    <div class="planet" id="saturn"></div>
+    <div class="planet" id="uranus"></div>
+    <div class="planet" id="neptune"></div>
+
+    <script>
+        const planets = {
+            mercury: { element: document.getElementById('mercury'), radius: 70, speed: 0.04 },
+            venus: { element: document.getElementById('venus'), radius: 100, speed: 0.015 },
+            earth: { element: document.getElementById('earth'), radius: 140, speed: 0.01 },
+            mars: { element: document.getElementById('mars'), radius: 190, speed: 0.008 },
+            jupiter: { element: document.getElementById('jupiter'), radius: 250, speed: 0.004 },
+            saturn: { element: document.getElementById('saturn'), radius: 320, speed: 0.003 },
+            uranus: { element: document.getElementById('uranus'), radius: 380, speed: 0.002 },
+            neptune: { element: document.getElementById('neptune'), radius: 450, speed: 0.001 }
+        };
+
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        let angles = {};
+
+        // 初始化角度
+        for (const planet in planets) {
+            angles[planet] = Math.random() * Math.PI * 2;
+        }
+
+        function animate() {
+            // 更新太阳位置
+            document.getElementById('sun').style.left = `${centerX - 50}px`;
+            document.getElementById('sun').style.top = `${centerY - 50}px`;
+
+            // 更新行星位置
+            for (const planet in planets) {
+                const { element, radius, speed } = planets[planet];
+                angles[planet] += speed;
+                
+                const x = centerX + Math.cos(angles[planet]) * radius;
+                const y = centerY + Math.sin(angles[planet]) * radius;
+                
+                element.style.left = `${x - parseInt(element.style.width)/2}px`;
+                element.style.top = `${y - parseInt(element.style.height)/2}px`;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

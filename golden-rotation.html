@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级万花筒效果</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+        }
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        button {
+            margin: 0 10px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="controls">
+        <button id="mode1">几何对称</button>
+        <button id="mode2">分形三角</button>
+        <button id="mode3">彩色波纹</button>
+        <button id="mode4">粒子星系</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let mode = 1;
+        let time = 0;
+        let rotation = 0;
+        const goldenRatio = (1 + Math.sqrt(5)) / 2;
+        const particles = Array(500).fill().map(() => ({
+            x: 0, y: 0,
+            vx: Math.random() * 4 - 2,
+            vy: Math.random() * 4 - 2,
+            size: Math.random() * 3 + 1,
+            color: `hsl(${Math.random() * 360}, 100%, 70%)`
+        }));
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // 模式1: 几何对称
+        function drawGeometric() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.8;
+            
+            rotation += 0.005;
+            time += 0.01;
+            
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2 + rotation;
+                const hue = (time * 20 + i * 45) % 360;
+                
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle);
+                
+                const shapeSize = size * (0.3 + 0.1 * Math.sin(time + i));
+                ctx.beginPath();
+                for (let j = 0; j < 5; j++) {
+                    const radius = shapeSize * (0.5 + 0.3 * Math.sin(time * 2 + j));
+                    const x = Math.cos(j / 5 * Math.PI * 2) * radius;
+                    const y = Math.sin(j / 5 * Math.PI * 2) * radius;
+                    j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, shapeSize);
+                gradient.addColorStop(0, `hsla(${hue}, 100%, 70%, 0.8)`);
+                gradient.addColorStop(1, `hsla(${(hue + 60) % 360}, 100%, 50%, 0.2)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                ctx.strokeStyle = `hsla(${hue}, 100%, 90%, 0.6)`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        // 模式2: 分形三角
+        function drawFractalTriangles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.6;
+            
+            rotation += 0.01;
+            time += 0.02;
+            
+            function drawTriangle(x, y, s, depth) {
+                if (depth > 4) return;
+                
+                const hue = (depth * 40 + time * 50) % 360;
+                const distortion = 0.1 * Math.sin(time * 2 + depth);
+                
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(rotation * (depth % 2 === 0 ? 1 : -1));
+                
+                ctx.beginPath();
+                ctx.moveTo(0, -s / 2 * (1 + distortion));
+                ctx.lineTo(s / 2, s / 2);
+                ctx.lineTo(-s / 2, s / 2);
+                ctx.closePath();
+                
+                ctx.fillStyle = `hsla(${hue}, 100%, 60%, ${0.7 - depth * 0.15})`;
+                ctx.fill();
+                ctx.strokeStyle = `hsla(${(hue + 30) % 360}, 100%, 80%, 0.8)`;
+                ctx.stroke();
+                
+                const newSize = s * 0.6;
+                drawTriangle(0, -s / 4, newSize, depth + 1);
+                drawTriangle(s / 3, s / 4, newSize, depth + 1);
+                drawTriangle(-s / 3, s / 4, newSize, depth + 1);
+                ctx.restore();
+            }
+            
+            for (let i = 0; i < 6; i++) {
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate((i / 6) * Math.PI * 2);
+                drawTriangle(0, -size * 0.4, size * 0.5, 0);
+                ctx.restore();
+            }
+        }
+
+        // 模式3: 彩色波纹
+        function drawColorRipples() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.5;
+            
+            rotation += 0.008;
+            time += 0.015;
+            
+            for (let layer = 0; layer < 5; layer++) {
+                const radius = maxRadius * (0.3 + layer * 0.15);
+                const segments = 16 + layer * 8;
+                const wave = Math.sin(time * 2 + layer) * 0.1;
+                
+                for (let i = 0; i < segments; i++) {
+                    const angle = (i / segments) * Math.PI * 2 + rotation;
+                    const hue = (time * 30 + i * 5 + layer * 20) % 360;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius * (1 + wave), angle, angle + Math.PI * 2 / segments);
+                    
+                    const gradient = ctx.createRadialGradient(
+                        centerX, centerY, radius * 0.8,
+                        centerX, centerY, radius * 1.2
+                    );
+                    gradient.addColorStop(0, `hsla(${hue}, 100%, 70%, 0.7)`);
+                    gradient.addColorStop(1, `hsla(${(hue + 60) % 360}, 100%, 50%, 0)`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            }
+        }
+
+        // 模式4: 粒子星系
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            rotation += 0.003;
+            time += 0.01;
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if (Math.abs(p.x) > centerX * 1.5 || Math.abs(p.y) > centerY * 1.5) {
+                    p.x = p.y = 0;
+                    p.vx = Math.random() * 4 - 2;
+                    p.vy = Math.random() * 4 - 2;
+                }
+                
+                ctx.beginPath();
+                ctx.arc(centerX + p.x, centerY + p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX + p.x, centerY + p.y);
+                ctx.lineTo(centerX + p.x - p.vx * 5, centerY + p.y - p.vy * 5);
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = p.size * 0.5;
+                ctx.stroke();
+            });
+            
+            const gradient = ctx.createRadialGradient(
+                centerX, centerY, 0,
+                centerX, centerY, centerX * 0.3
+            );
+            gradient.addColorStop(0, `hsla(${(time * 10) % 360}, 100%, 70%, 0.8)`);
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, centerX * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        function animate() {
+            switch(mode) {
+                case 1: drawGeometric(); break;
+                case 2: drawFractalTriangles(); break;
+                case 3: drawColorRipples(); break;
+                case 4: drawParticles(); break;
+            }
+            requestAnimationFrame(animate);
+        }
+
+        document.getElementById('mode1').addEventListener('click', () => mode = 1);
+        document.getElementById('mode2').addEventListener('click', () => mode = 2);
+        document.getElementById('mode3').addEventListener('click', () => mode = 3);
+        document.getElementById('mode4').addEventListener('click', () => mode = 4);
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animate();
+    </script>
+</body>
+</html>

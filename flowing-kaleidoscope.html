@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流动万花筒</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        #canvas {
+            display: block;
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const size = Math.min(window.innerWidth, window.innerHeight);
+            canvas.width = size;
+            canvas.height = size;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 万花筒参数
+        const segments = 12;
+        let rotation = 0;
+        let flowOffset = 0;
+        const colors = [
+            '#FF5252', '#FF4081', '#E040FB', '#7C4DFF',
+            '#536DFE', '#448AFF', '#40C4FF', '#18FFFF',
+            '#64FFDA', '#69F0AE', '#B2FF59', '#EEFF41'
+        ];
+        
+        function drawFlowingKaleidoscope() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) / 2;
+            
+            rotation += 0.03; // 从0.01增加到0.03，进一步加快旋转速度
+            flowOffset += 0.01;
+            
+            // 创建流动背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, 'rgba(0,0,0,0)');
+            gradient.addColorStop(0.5, 'rgba(50,50,50,0.3)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制流动图案
+            for (let i = 0; i < segments; i++) {
+                const angle = (i / segments) * Math.PI * 2 + rotation;
+                
+                // 创建流动渐变
+                const patternGradient = ctx.createRadialGradient(
+                    centerX, 
+                    centerY,
+                    0,
+                    centerX, 
+                    centerY,
+                    radius * 0.9
+                );
+                
+                // 恢复原始颜色
+                patternGradient.addColorStop(0, colors[i % colors.length]);
+                patternGradient.addColorStop(1, 'rgba(0,0,0,0)');
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(
+                    centerX, 
+                    centerY, 
+                    radius * 0.9,  // 从0.7扩大到0.9
+                    angle, 
+                    angle + (Math.PI * 2 / segments)
+                );
+                ctx.closePath();
+                ctx.fillStyle = patternGradient;
+                ctx.fill();
+            }
+                
+                // 绘制中心小型万花筒
+                const innerSegments = 8;
+                const innerRadius = radius * 0.3;
+                
+                for (let i = 0; i < innerSegments; i++) {
+                    const angle = (i / innerSegments) * Math.PI * 2 - rotation * 1.5; // 反向旋转
+                    const waveOffset = Math.sin(flowOffset * 2 + i * 0.5) * 0.1;
+                    
+                    const innerGradient = ctx.createRadialGradient(
+                        centerX,
+                        centerY,
+                        0,
+                        centerX,
+                        centerY,
+                        innerRadius * 0.9
+                    );
+                    
+                    innerGradient.addColorStop(0, colors[(i + 6) % colors.length]);
+                    innerGradient.addColorStop(1, 'rgba(0,0,0,0)');
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(
+                        centerX,
+                        centerY,
+                        innerRadius * (0.8 + waveOffset * 0.2),
+                        angle,
+                        angle + (Math.PI * 2 / innerSegments)
+                    );
+                    ctx.closePath();
+                    ctx.fillStyle = innerGradient;
+                    ctx.fill();
+                }
+            }
+            
+            // 绘制旋转正方形
+            const squareCount = 12;
+            const outerSquareSize = radius * 0.8;
+            const innerSquareSize = radius * 0.6;
+            const smallSquareSize = radius * 0.4;
+            
+            for (let i = 0; i < squareCount; i++) {
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                const rotationSpeed = 0.5 + i * 0.05;
+                ctx.rotate(rotation * rotationSpeed);
+                
+                // 绘制外接正方形
+                const boundingSize = outerSquareSize * 1.2; // 外接正方形大小
+                ctx.beginPath();
+                ctx.moveTo(-boundingSize/2, -boundingSize/2);
+                ctx.lineTo(boundingSize/2, -boundingSize/2);
+                ctx.lineTo(boundingSize/2, boundingSize/2);
+                ctx.lineTo(-boundingSize/2, boundingSize/2);
+                ctx.closePath();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 + i*0.02})`; // 半透明白色
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // 绘制外层大正方形并连接角
+                ctx.beginPath();
+                ctx.moveTo(-outerSquareSize/2, -outerSquareSize/2);
+                ctx.lineTo(outerSquareSize/2, -outerSquareSize/2);
+                ctx.lineTo(outerSquareSize/2, outerSquareSize/2);
+                ctx.lineTo(-outerSquareSize/2, outerSquareSize/2);
+                ctx.closePath();
+                ctx.strokeStyle = colors[i % colors.length];
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                
+                // 绘制中层正方形并连接角
+                ctx.beginPath();
+                ctx.moveTo(-innerSquareSize/2, -innerSquareSize/2);
+                ctx.lineTo(innerSquareSize/2, -innerSquareSize/2);
+                ctx.lineTo(innerSquareSize/2, innerSquareSize/2);
+                ctx.lineTo(-innerSquareSize/2, innerSquareSize/2);
+                ctx.closePath();
+                ctx.strokeStyle = colors[(i + 4) % colors.length];
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // 绘制中心小正方形并连接角
+                ctx.beginPath();
+                ctx.moveTo(-smallSquareSize/2, -smallSquareSize/2);
+                ctx.lineTo(smallSquareSize/2, -smallSquareSize/2);
+                ctx.lineTo(smallSquareSize/2, smallSquareSize/2);
+                ctx.lineTo(-smallSquareSize/2, smallSquareSize/2);
+                ctx.closePath();
+                ctx.strokeStyle = colors[(i + 8) % colors.length];
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 连接不同正方形的角
+                ctx.beginPath();
+                ctx.moveTo(-outerSquareSize/2, -outerSquareSize/2);
+                ctx.lineTo(-innerSquareSize/2, -innerSquareSize/2);
+                ctx.lineTo(-smallSquareSize/2, -smallSquareSize/2);
+                ctx.moveTo(outerSquareSize/2, -outerSquareSize/2);
+                ctx.lineTo(innerSquareSize/2, -innerSquareSize/2);
+                ctx.lineTo(smallSquareSize/2, -smallSquareSize/2);
+                ctx.moveTo(outerSquareSize/2, outerSquareSize/2);
+                ctx.lineTo(innerSquareSize/2, innerSquareSize/2);
+                ctx.lineTo(smallSquareSize/2, smallSquareSize/2);
+                ctx.moveTo(-outerSquareSize/2, outerSquareSize/2);
+                ctx.lineTo(-innerSquareSize/2, innerSquareSize/2);
+                ctx.lineTo(-smallSquareSize/2, smallSquareSize/2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+
+            requestAnimationFrame(drawFlowingKaleidoscope);
+        }
+        
+        drawFlowingKaleidoscope();
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>宇宙万花筒画报</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        canvas { 
+            display: block; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .poster-content {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            pointer-events: none;
+        }
+        /* 新增宇宙元素样式 */
+        .cosmic-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        }
+        h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(255, 100, 200, 0.8);
+        }
+        .date {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 30px;
+            border-radius: 50px;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(100, 200, 255, 0.8);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(100, 200, 255, 0.8), 
+                            0 0 30px rgba(255, 100, 200, 0.8);
+            }
+        }
+        
+        /* 新增画报专属样式 */
+        .poster-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #000000 0%, #0a0a2a 100%);
+        }
+        
+        .cosmic-title {
+            font-size: 6rem;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px rgba(79, 172, 254, 0.7);
+        }
+        
+        .cosmic-subtitle {
+            font-size: 2.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 3rem;
+        }
+        
+        .event-info {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px 40px;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* 新增流星效果 */
+        .meteor {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px white;
+            animation: meteor-fall linear infinite;
+        }
+        
+        @keyframes meteor-fall {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-1000px) translateY(1000px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="poster-container">
+        <!-- 新增静态宇宙元素层 -->
+        <div class="static-cosmic" id="staticCosmic"></div>
+        
+        <canvas id="canvas"></canvas>
+        
+        <div class="cosmic-elements" id="cosmicElements"></div>
+        
+        <div class="poster-content">
+            <h1 class="cosmic-title">宇宙万花筒</h1>
+            <h2 class="cosmic-subtitle">穿越维度的视觉奇观</h2>
+            <div class="event-info">
+                <div class="date">2023年12月31日 20:00</div>
+                <div class="location">银河系 · 星际艺术中心</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 这里放入您现有的kaleidoscope.html中的全部JavaScript代码
+        // 从const canvas = document.getElementById('canvas');开始
+        // 到最后的init(); draw();结束
+        
+        // 新增宇宙元素生成代码
+        function createCosmicElements() {
+            const container = document.getElementById('cosmicElements');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            // 创建星星
+            for(let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() * 2;
+                star.className = 'star';
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * width}px`;
+                star.style.top = `${Math.random() * height}px`;
+                star.style.setProperty('--duration', `${2 + Math.random() * 3}s`);
+                container.appendChild(star);
+            }
+            
+            // 创建行星
+            for(let i = 0; i < 5; i++) {
+                const planet = document.createElement('div');
+                const size = 30 + Math.random() * 70;
+                planet.className = 'planet';
+                planet.style.width = `${size}px`;
+                planet.style.height = `${size}px`;
+                planet.style.left = `${50 + Math.random() * (width - 100)}px`;
+                planet.style.top = `${50 + Math.random() * (height - 100)}px`;
+                planet.style.background = `radial-gradient(circle at 30% 30%, 
+                    hsl(${Math.random() * 360}, 80%, 70%), 
+                    hsl(${Math.random() * 360}, 80%, 30%))`;
+                container.appendChild(planet);
+            }
+        }
+
+        // 在init函数中调用
+        // 新增流星生成函数
+        function createMeteors() {
+            const container = document.getElementById('cosmicElements');
+            
+            setInterval(() => {
+                const meteor = document.createElement('div');
+                meteor.className = 'meteor';
+                meteor.style.left = `${Math.random() * window.innerWidth + 100}px`;
+                meteor.style.top = `${-10}px`;
+                meteor.style.animationDuration = `${2 + Math.random() * 3}s`;
+                container.appendChild(meteor);
+                
+                // 移除流星元素
+                setTimeout(() => {
+                    meteor.remove();
+                }, 3000);
+            }, 500);
+        }
+        
+        /* 新增静态宇宙元素样式 */
+        .static-cosmic {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            filter: blur(30px);
+        }
+        
+        .constellation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .constellation-line {
+            position: absolute;
+            height: 1px;
+            background: rgba(100, 200, 255, 0.3);
+            transform-origin: 0 0;
+        }
+        
+        // 新增静态元素生成函数
+        function createStaticElements() {
+            const container = document.getElementById('staticCosmic');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            // 创建星云
+            for(let i = 0; i < 4; i++) {
+                const nebula = document.createElement('div');
+                nebula.className = 'nebula';
+                const size = 200 + Math.random() * 300;
+                nebula.style.width = `${size}px`;
+                nebula.style.height = `${size}px`;
+                nebula.style.left = `${Math.random() * width}px`;
+                nebula.style.top = `${Math.random() * height}px`;
+                nebula.style.background = `radial-gradient(circle, 
+                    hsl(${Math.random() * 360}, 80%, 60%), transparent)`;
+                container.appendChild(nebula);
+            }
+
+            // 创建星座连线
+            const constellation = document.createElement('div');
+            constellation.className = 'constellation';
+            
+            // 星座点位置
+            const stars = [];
+            for(let i = 0; i < 10; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height * 0.6
+                });
+            }
+            
+            // 星座连线
+            for(let i = 0; i < stars.length; i++) {
+                for(let j = i + 1; j < stars.length; j++) {
+                    if(Math.random() > 0.7) { // 70%几率不连线
+                        const line = document.createElement('div');
+                        line.className = 'constellation-line';
+                        
+                        const dx = stars[j].x - stars[i].x;
+                        const dy = stars[j].y - stars[i].y;
+                        const length = Math.sqrt(dx * dx + dy * dy);
+                        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                        
+                        line.style.width = `${length}px`;
+                        line.style.left = `${stars[i].x}px`;
+                        line.style.top = `${stars[i].y}px`;
+                        line.style.transform = `rotate(${angle}deg)`;
+                        
+                        constellation.appendChild(line);
+                    }
+                }
+            }
+            
+            container.appendChild(constellation);
+        }
+
+        function init() {
+            // ... 原有初始化代码 ...
+            createCosmicElements();
+            createMeteors();
+            createStaticElements(); // 新增
+        }
+    </script>
+</body>
+</html>

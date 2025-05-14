@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .car-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="car-info">
+        <h1>Car Information System</h1>
+        <button onclick="displayCarInfo()">Show Car Info</button>
+        <button onclick="startCar()">Start Engine</button>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        let car = {
+            make: "Toyota",
+            model: "Camry", 
+            year: 2022,
+            start: function(callback) {
+                const status = "Engine started! Vroom vroom!";
+                if (typeof callback === 'function') {
+                    callback(status);
+                }
+                return status;
+            },
+            displayInfo: function() {
+                return `Make: ${this.make}, Model: ${this.model}, Year: ${this.year}`;
+            }
+        };
+
+        function displayCarInfo() {
+            document.getElementById('output').innerHTML = car.displayInfo();
+        }
+
+        function startCar() {
+            // 使用回调函数处理启动后的状态
+            car.start(function(status) {
+                console.log("回调函数收到状态:", status);
+                document.getElementById('output').innerHTML = status + " (来自回调)";
+            });
+        }
+
+        // 新增的回调函数示例
+        function processCarAction(action, callback) {
+            console.log("正在执行操作:", action);
+            setTimeout(() => {
+                const result = `操作完成: ${action}`;
+                callback(result);
+            }, 1000);
+        }
+        //回调函数练习
+        consle.log('11111111')
+        settimeout(function(){
+            console.log('22222222')
+        },2000)
+
+        console.log('33333333')
+
+        <script>
+            myDom = document.getElementById('demo')
+            consle.log(myDom)
+            myDom.innerHTML='这是从脚本动态更改的内容'
+        </script>   
+
+
+
+
+
+    </script>
+</body>
+</html>
