@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>万花筒视觉特效</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; }
+        .controls { 
+            position: fixed; 
+            bottom: 20px; 
+            width: 100%; 
+            text-align: center; 
+            z-index: 100;
+        }
+        button { 
+            margin: 0 10px; 
+            padding: 8px 15px; 
+            background: rgba(255,255,255,0.2); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.5); 
+            border-radius: 20px;
+            cursor: pointer; 
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: rgba(255,255,255,0.4);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="controls">
+        <button id="mode1">几何对称</button>
+        <button id="mode2">分形三角</button>
+        <button id="mode3">彩色波纹</button>
+        <button id="mode4">粒子星系</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let mode = 1;
+        let time = 0;
+        let rotation = 0;
+        const particles = [];
+        
+        // 初始化
+        function init() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 初始化粒子
+            for (let i = 0; i < 500; i++) {
+                particles.push({
+                    x: Math.random() * 2 - 1,
+                    y: Math.random() * 2 - 1,
+                    vx: Math.random() * 2 - 1,
+                    vy: Math.random() * 2 - 1,
+                    size: Math.random() * 3 + 1,
+                    color: `hsl(${Math.random() * 360}, 100%, 70%)`
+                });
+            }
+        }
+        
+        // 修改resizeCanvas函数
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(dpr, dpr);
+        }
+
+        // 模式1: 几何对称 (中心旋转版)
+        function drawGeometric() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.8;
+            
+            rotation += 0.008;
+            time += 0.015;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            // 绘制8个主形状
+            for (let i = 0; i < 8; i++) {
+                ctx.save();
+                ctx.rotate((i / 8) * Math.PI * 2);
+                
+                const hue = (time * 25 + i * 45) % 360;
+                const scale = 0.7 + 0.1 * Math.sin(time * 1.5 + i);
+                
+                // 创建渐变
+                const gradient = ctx.createLinearGradient(0, -size/2, 0, size/2);
+                gradient.addColorStop(0, `hsla(${hue}, 100%, 80%, 0.9)`);
+                gradient.addColorStop(1, `hsla(${(hue + 120) % 360}, 100%, 60%, 0.5)`);
+                
+                // 绘制形状
+                ctx.beginPath();
+                ctx.moveTo(0, -size/2 * scale);
+                ctx.lineTo(size/2 * scale, size/2 * scale);
+                ctx.lineTo(-size/2 * scale, size/2 * scale);
+                ctx.closePath();
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                ctx.strokeStyle = `hsla(${(hue + 180) % 360}, 100%, 90%, 0.8)`;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            // 中心光晕
+            const glowSize = size * 0.3;
+            const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+            glowGradient.addColorStop(0, `hsla(${(time * 20) % 360}, 100%, 90%, 0.9)`);
+            glowGradient.addColorStop(1, `hsla(${(time * 20 + 120) % 360}, 100%, 70%, 0)`);
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = glowGradient;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // 模式2: 分形三角 (中心旋转版)
+        function drawFractalTriangles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.7;
+            
+            rotation += 0.01;
+            time += 0.02;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            // 绘制12个主三角形
+            for (let i = 0; i < 12; i++) {
+                ctx.save();
+                ctx.rotate((i / 12) * Math.PI * 2);
+                
+                const hue = (time * 30 + i * 30) % 360;
+                const scale = 0.6 + 0.1 * Math.sin(time + i * 0.5);
+                
+                // 创建渐变
+                const gradient = ctx.createLinearGradient(0, -size/2, 0, size/2);
+                gradient.addColorStop(0, `hsla(${hue}, 100%, 85%, 0.9)`);
+                gradient.addColorStop(1, `hsla(${(hue + 60) % 360}, 100%, 65%, 0.6)`);
+                
+                // 绘制三角形
+                ctx.beginPath();
+                ctx.moveTo(0, -size/3 * scale);
+                ctx.lineTo(size/3 * scale, size/3 * scale);
+                ctx.lineTo(-size/3 * scale, size/3 * scale);
+                ctx.closePath();
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                ctx.strokeStyle = `hsla(${(hue + 120) % 360}, 100%, 90%, 0.8)`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            // 中心光晕
+            const glowSize = size * 0.25;
+            const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+            glowGradient.addColorStop(0, `hsla(${(time * 40) % 360}, 100%, 95%, 0.9)`);
+            glowGradient.addColorStop(1, `hsla(${(time * 40 + 180) % 360}, 100%, 75%, 0)`);
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = glowGradient;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // 模式3: 彩色波纹 (中心旋转版)
+        function drawColorRipples() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.6;
+            
+            rotation += 0.015;
+            time += 0.025;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            // 绘制5层波纹
+            for (let layer = 0; layer < 5; layer++) {
+                const radius = size * (0.2 + layer * 0.15);
+                const segments = 24 + layer * 12;
+                
+                for (let i = 0; i < segments; i++) {
+                    const hue = (time * 20 + i * 15 + layer * 30) % 360;
+                    
+                    // 创建渐变
+                    const gradient = ctx.createRadialGradient(0, 0, radius * 0.8, 0, 0, radius * 1.2);
+                    gradient.addColorStop(0, `hsla(${hue}, 100%, 80%, 0.8)`);
+                    gradient.addColorStop(1, `hsla(${(hue + 120) % 360}, 100%, 60%, 0)`);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.arc(0, 0, radius, 
+                          (i / segments) * Math.PI * 2, 
+                          ((i + 1) / segments) * Math.PI * 2);
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            }
+            
+            // 中心光晕
+            const glowSize = size * 0.3;
+            const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+            glowGradient.addColorStop(0, `hsla(${(time * 30) % 360}, 100%, 90%, 0.9)`);
+            glowGradient.addColorStop(1, `hsla(${(time * 30 + 90) % 360}, 100%, 70%, 0)`);
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = glowGradient;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // 模式4: 粒子星系 (中心旋转版)
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const size = Math.min(canvas.width, canvas.height) * 0.5;
+            
+            rotation += 0.01;
+            time += 0.02;
+            
+            particles.forEach((p, i) => {
+                // 粒子运动 - 向中心旋转
+                const angle = Math.atan2(p.y, p.x) + rotation * 0.5;
+                const dist = Math.sqrt(p.x * p.x + p.y * p.y);
+                
+                // 向心力
+                const force = -0.0005 * dist;
+                p.vx += p.x * force;
+                p.vy += p.y * force;
+                
+                // 切线速度
+                p.vx += -p.y * 0.0003;
+                p.vy += p.x * 0.0003;
+                
+                // 错误位置：粒子更新部分
+                p.x += p.vx;
+                p.y += p.y;  // 这里应该是 p.y += p.vy;
+                
+                // 修正为：
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // 边界处理
+                // 建议修改粒子边界处理部分
+                if (dist > size) {
+                    p.x = Math.cos(angle) * size * 0.9;
+                    p.y = Math.sin(angle) * size * 0.9;
+                    // 重置速度以避免粒子聚集
+                    p.vx = -p.y * 0.1;
+                    p.vy = p.x * 0.1;
+                }
+                
+                // 绘制粒子
+                const hue = (time * 15 + i * 0.5) % 360;
+                const particleSize = p.size * (0.8 + 0.2 * Math.sin(time * 2 + i * 0.1));
+                
+                ctx.beginPath();
+                ctx.arc(centerX + p.x * size, centerY + p.y * size, particleSize, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${hue}, 100%, 80%, 0.9)`;
+                ctx.fill();
+            });
+            
+            // 中心黑洞
+            const holeSize = size * 0.2;
+            const holeGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, holeSize);
+            holeGradient.addColorStop(0, `hsla(${(time * 10) % 360}, 100%, 70%, 1)`);
+            holeGradient.addColorStop(1, `hsla(${(time * 10 + 60) % 360}, 100%, 40%, 0)`);
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, holeSize, 0, Math.PI * 2);
+            ctx.fillStyle = holeGradient;
+            ctx.fill();
+        }
+
+        // 动画循环
+        // 在animate函数开始处添加帧率控制
+        let lastTime = 0;
+        function animate(currentTime) {
+        if (!lastTime || currentTime - lastTime > 16) { // 约60fps
+        lastTime = currentTime;
+        switch(mode) {
+                case 1: drawGeometric(); break;
+                case 2: drawFractalTriangles(); break;
+                case 3: drawColorRipples(); break;
+                case 4: drawParticles(); break;
+            }
+            requestAnimationFrame(animate);
+        }
+        
+        // 设置控制按钮
+        document.getElementById('mode1').addEventListener('click', () => mode = 1);
+        document.getElementById('mode2').addEventListener('click', () => mode = 2);
+        document.getElementById('mode3').addEventListener('click', () => mode = 3);
+        document.getElementById('mode4').addEventListener('click', () => mode = 4);
+        
+        // 内存泄漏预防：
+        // 在init函数中添加窗口关闭事件处理
+        window.addEventListener('beforeunload', () => {
+            cancelAnimationFrame(animate);
+        });
+        
+        // 初始化并开始动画
+        init();
+        animate();
+    </script>
+</body>
+</html>

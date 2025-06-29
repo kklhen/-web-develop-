@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金分割螺旋模型</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            width: 800px;
+            height: 800px;
+            position: relative;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .rectangle {
+            position: absolute;
+            border: 1px solid rgba(218, 165, 32, 0.7);
+            box-sizing: border-box;
+        }
+        
+        .spiral-line {
+            position: absolute;
+            border: 2px solid goldenrod;
+            border-radius: 50%;
+            transform-origin: center;
+            box-sizing: border-box;
+        }
+        
+        .label {
+            position: absolute;
+            font-size: 12px;
+            color: #333;
+            background-color: rgba(255,255,255,0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="spiral-container"></div>
+    
+    <script>
+        const container = document.getElementById('spiral-container');
+        const width = 800;
+        const height = 800;
+        const goldenRatio = 1.618;
+        let currentSize = width;
+        let rotation = 0;
+        let x = 0;
+        let y = 0;
+        let direction = 0; // 0: right, 1: down, 2: left, 3: up
+        
+        function createGoldenSpiral() {
+            container.innerHTML = '';
+            
+            let size = width;
+            let posX = 0;
+            let posY = 0;
+            let angle = 0;
+            
+            for (let i = 0; size > 10; i++) {
+                // 创建矩形
+                const rect = document.createElement('div');
+                rect.className = 'rectangle';
+                rect.style.width = `${size}px`;
+                rect.style.height = `${size / goldenRatio}px`;
+                rect.style.left = `${posX}px`;
+                rect.style.top = `${posY}px`;
+                container.appendChild(rect);
+                
+                // 创建螺旋线
+                const spiral = document.createElement('div');
+                spiral.className = 'spiral-line';
+                
+                if (i % 4 === 0) {
+                    // 右上角弧线
+                    spiral.style.width = `${size * 2}px`;
+                    spiral.style.height = `${size * 2}px`;
+                    spiral.style.left = `${posX}px`;
+                    spiral.style.top = `${posY}px`;
+                    spiral.style.borderRight = 'none';
+                    spiral.style.borderBottom = 'none';
+                } else if (i % 4 === 1) {
+                    // 右下角弧线
+                    spiral.style.width = `${size * 2 * goldenRatio}px`;
+                    spiral.style.height = `${size * 2 * goldenRatio}px`;
+                    spiral.style.left = `${posX + size - size * goldenRatio}px`;
+                    spiral.style.top = `${posY}px`;
+                    spiral.style.borderLeft = 'none';
+                    spiral.style.borderBottom = 'none';
+                } else if (i % 4 === 2) {
+                    // 左下角弧线
+                    spiral.style.width = `${size * 2 * goldenRatio * goldenRatio}px`;
+                    spiral.style.height = `${size * 2 * goldenRatio * goldenRatio}px`;
+                    spiral.style.left = `${posX + size - size * goldenRatio}px`;
+                    spiral.style.top = `${posY + size / goldenRatio - size * goldenRatio}px`;
+                    spiral.style.borderLeft = 'none';
+                    spiral.style.borderTop = 'none';
+                } else {
+                    // 左上角弧线
+                    spiral.style.width = `${size * 2 * Math.pow(goldenRatio, 3)}px`;
+                    spiral.style.height = `${size * 2 * Math.pow(goldenRatio, 3)}px`;
+                    spiral.style.left = `${posX}px`;
+                    spiral.style.top = `${posY + size / goldenRatio - size * goldenRatio}px`;
+                    spiral.style.borderRight = 'none';
+                    spiral.style.borderTop = 'none';
+                }
+                
+                container.appendChild(spiral);
+                
+                // 更新位置和大小
+                switch (i % 4) {
+                    case 0:
+                        posX += size;
+                        size = size / goldenRatio;
+                        break;
+                    case 1:
+                        posY += size / goldenRatio;
+                        size = size / goldenRatio;
+                        break;
+                    case 2:
+                        posX -= size;
+                        size = size / goldenRatio;
+                        break;
+                    case 3:
+                        posY -= size / goldenRatio;
+                        size = size / goldenRatio;
+                        break;
+                }
+                
+                // 添加标签
+                if (i % 4 === 0) {
+                    const label = document.createElement('div');
+                    label.className = 'label';
+                    label.textContent = `${(100/Math.pow(goldenRatio, i)).toFixed(1)}%`;
+                    label.style.left = `${posX + size - 30}px`;
+                    label.style.top = `${posY + 10}px`;
+                    container.appendChild(label);
+                }
+            }
+        }
+        
+        window.addEventListener('resize', () => {
+            container.style.width = `${Math.min(window.innerWidth - 40, 800)}px`;
+            container.style.height = `${Math.min(window.innerHeight - 40, 800)}px`;
+            createGoldenSpiral();
+        });
+        
+        createGoldenSpiral();
+    </script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>高级万花筒效果</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        .controls { position: fixed; bottom: 20px; width: 100%; text-align: center; }
+        button { margin: 0 5px; padding: 8px 15px; background: rgba(255,255,255,0.1); 
+                color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 15px; }
+    </style>
+</head>
+<body>
+    <canvas id="kaleidoscope"></canvas>
+    <div class="controls">
+        <button data-mode="1">量子分形</button>
+        <button data-mode="2">星云漩涡</button>
+        <button data-mode="3">极光矩阵</button>
+        <button data-mode="4">细胞生长</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('kaleidoscope');
+        const ctx = canvas.getContext('2d');
+        let mode = 1, time = 0, rotation = 0;
+        
+        // 初始化粒子系统
+        const particles = Array(300).fill().map(() => ({
+            x: Math.random()*2-1, y: Math.random()*2-1,
+            size: Math.random()*4+1, angle: Math.random()*Math.PI*2,
+            speed: Math.random()*0.02+0.01, dist: Math.random()*0.8+0.1
+        }));
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // 模式1: 分形三角
+        function drawQuantumFractal() {
+            const centerX = canvas.width/2, centerY = canvas.height/2;
+            const size = Math.min(canvas.width, canvas.height)*0.9;
+            
+            time += 0.08;
+            rotation += 0.05;  // 从0.035增加到0.05
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            // 5层分形三角结构
+            for(let layer=0; layer<5; layer++) {
+                const layerScale = 0.3 + layer*0.2;  // 调整缩放系数使各层更分散
+                const segments = 6 + layer*2;  // 减少每层三角形数量
+                const wave = 0.2 * Math.sin(time*2.2 + layer);
+                
+                // 增加层间偏移量
+                const layerOffset = size * 0.2 * layer;  // 增大偏移量
+                ctx.save();
+                ctx.translate(0, layerOffset);
+                
+                for(let i=0; i<segments; i++) {
+                    ctx.save();
+                    // 增加角度间隔和径向偏移
+                    const angle = i*(Math.PI*2/segments)*2 + layer*0.05;  // 加倍角度间隔
+                    ctx.rotate(angle);
+                    
+                    const radialOffset = size * 0.15 * layer;  // 增大径向偏移
+                    ctx.translate(0, radialOffset);
+                    
+                    // 旋转三角形自身
+                    ctx.rotate(time*0.8 + layer*0.2);  // 从time*0.5增加到time*0.8
+                    
+                    const hue = (time*45 + i*25 + layer*20) % 360;
+                    const saturation = 85 + 10 * Math.sin(time*3 + i*0.4);
+                    const lightness = 70 + 15 * Math.cos(time*2.5 + layer);
+                    
+                    // 分形三角主体 - 修改为等边三角形
+                    const gradient = ctx.createLinearGradient(
+                        0, -size/3*layerScale, 
+                        size/4*layerScale, size/3*layerScale
+                    );
+                    gradient.addColorStop(0, `hsla(${hue},${saturation}%,${lightness}%,0.8)`);
+                    gradient.addColorStop(0.5, `hsla(${(hue+60)%360},${saturation}%,${lightness-5}%,0.6)`);
+                    gradient.addColorStop(1, `hsla(${(hue+120)%360},${saturation}%,${lightness-10}%,0.4)`);
+                    
+                    const triangleHeight = size/6*layerScale;  // 进一步减小三角形尺寸
+                    const triangleSide = triangleHeight * 2/Math.sqrt(3);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, -triangleHeight);
+                    ctx.lineTo(triangleSide/2, triangleHeight/2);
+                    ctx.lineTo(-triangleSide/2, triangleHeight/2);
+                    ctx.closePath();
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    
+                    // 三角内部分形线 - 也调整为等边三角形
+                    for(let j=1; j<3; j++) {
+                        const innerHeight = triangleHeight * (1 - j*0.3);
+                        const innerSide = innerHeight * 2/Math.sqrt(3);
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(0, -innerHeight);
+                        ctx.lineTo(innerSide/2, innerHeight/2);
+                        ctx.lineTo(-innerSide/2, innerHeight/2);
+                        ctx.closePath();
+                        ctx.strokeStyle = `hsla(${(hue+j*40)%360},100%,90%,0.6)`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                    
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        // 模式2: 星云漩涡
+        function drawNebula() {
+            const centerX = canvas.width/2, centerY = canvas.height/2;
+            const size = Math.min(canvas.width, canvas.height)*0.95;
+            
+            time += 0.04;  // 加快时间变化
+            rotation += 0.02;  // 加快旋转速度
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            // 星际尘埃粒子系统 - 增加到800个粒子
+            const dustParticles = 800;
+            for(let i=0; i<dustParticles; i++) {
+                const angle = (i/dustParticles)*Math.PI*24 + time*3;
+                const radius = size*(0.1 + 0.7*Math.pow(i/dustParticles, 1.5));
+                const pulse = 0.6 + 0.4*Math.sin(time*4 + i*0.15);
+                
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                const hue = (time*25 + i*0.7) % 360;
+                const alpha = 0.3 + 0.4*pulse;
+                const particleSize = 1.5 + pulse*3;
+                
+                // 粒子发光效果
+                const gradient = ctx.createRadialGradient(
+                    x, y, 0,
+                    x, y, particleSize
+                );
+                gradient.addColorStop(0, `hsla(${hue},90%,85%,${alpha})`);
+                gradient.addColorStop(1, `hsla(${(hue+60)%360},80%,70%,0)`);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, particleSize, 0, Math.PI*2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+            
+            // 星际漩涡核心 - 增加到6层
+            for(let layer=0; layer<6; layer++) {
+                const layerScale = 0.3 + layer*0.15;
+                const segments = 16;
+                const wave1 = 0.15 * Math.sin(time*2.5 + layer);
+                const wave2 = 0.1 * Math.cos(time*1.5 + layer*0.8);
+                
+                for(let i=0; i<segments; i++) {
+                    ctx.save();
+                    ctx.rotate(i*Math.PI*2/segments + layer*0.08);
+                    
+                    const hue = (time*18 + i*25 + layer*15) % 360;
+                    const saturation = 75 + 20 * Math.sin(time*2 + i*0.5);
+                    const lightness = 75 + 15 * Math.cos(time*1.8 + layer*0.6);
+                    
+                    // 漩涡臂渐变
+                    const gradient = ctx.createLinearGradient(
+                        0, -size/3*layerScale,
+                        size/5*layerScale, size/3*layerScale
+                    );
+                    gradient.addColorStop(0, `hsla(${hue},${saturation}%,${lightness}%,0.8)`);
+                    gradient.addColorStop(0.6, `hsla(${(hue+40)%360},${saturation}%,${lightness-5}%,0.6)`);
+                    gradient.addColorStop(1, `hsla(${(hue+80)%360},${saturation}%,${lightness-10}%,0.3)`);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, -size/3*layerScale);
+                    ctx.bezierCurveTo(
+                        size/4*layerScale*(1+wave1), -size/6*layerScale*(1+wave2),
+                        size/4*layerScale*(1-wave2), size/6*layerScale*(1+wave1),
+                        0, size/3*layerScale
+                    );
+                    ctx.bezierCurveTo(
+                        -size/4*layerScale*(1-wave2), size/6*layerScale*(1+wave1),
+                        -size/4*layerScale*(1+wave1), -size/6*layerScale*(1+wave2),
+                        0, -size/3*layerScale
+                    );
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                    
+                    // 漩涡臂高光
+                    if(layer % 2 === 0) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, -size/3*layerScale);
+                        ctx.quadraticCurveTo(
+                            size/8*layerScale, 0,
+                            0, size/3*layerScale
+                        );
+                        ctx.strokeStyle = `hsla(${(hue+20)%360},100%,95%,0.5)`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                    
+                    ctx.restore();
+                }
+            }
+            
+            // 中心黑洞效果
+            const blackHoleGradient = ctx.createRadialGradient(
+                0, 0, size*0.05,
+                0, 0, size*0.15
+            );
+            blackHoleGradient.addColorStop(0, 'rgba(0,0,0,1)');
+            blackHoleGradient.addColorStop(1, 'rgba(50,0,80,0.3)');
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, size*0.15, 0, Math.PI*2);
+            ctx.fillStyle = blackHoleGradient;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        // 模式3: 极光矩阵(冷色调)
+        function drawBlackHoleKaleidoscope() {
+            const centerX = canvas.width/2, centerY = canvas.height/2;
+            const size = Math.min(canvas.width, canvas.height)*0.9;
+            
+            time += 0.06;
+            rotation += 0.04;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            // 黑洞吸积盘
+            const rings = 8;
+            for(let i=0; i<rings; i++) {
+                const radius = size*(0.1 + 0.7*i/rings);
+                const thickness = size*(0.02 + 0.03*Math.sin(time*2 + i*0.5));
+                const segments = 12 + i*4;
+                
+                for(let j=0; j<segments; j++) {
+                    const angle = j*Math.PI*2/segments;
+                    const hue = (180 + time*10 + i*15 + j*8) % 240;  // 合并为一次声明
+                    const pulse = 0.7 + 0.3*Math.sin(time*3 + i + j*0.3);  // 合并为一次声明
+                    
+                    // 吸积盘片段
+                    ctx.beginPath();
+                    ctx.arc(0, 0, radius, angle, angle + Math.PI*2/segments*0.9);
+                    ctx.arc(0, 0, radius + thickness*pulse, angle + Math.PI*2/segments*0.9, angle, true);
+                    ctx.closePath();
+                    
+                    const gradient = ctx.createRadialGradient(
+                        0, 0, radius,
+                        0, 0, radius + thickness*pulse
+                    );
+                    gradient.addColorStop(0, `hsla(${hue},90%,70%,0.8)`);
+                    gradient.addColorStop(1, `hsla(${(hue+30)%240},80%,50%,0.3)`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+                }
+            }
+            
+            // 修改事件视界颜色为深冷色调
+            const horizonGradient = ctx.createRadialGradient(
+                0, 0, size*0.05,
+                0, 0, size*0.15
+            );
+            horizonGradient.addColorStop(0, 'rgba(0,10,20,1)');  // 深蓝黑色
+            horizonGradient.addColorStop(0.7, 'rgba(20,50,80,0.8)');  // 深蓝色
+            horizonGradient.addColorStop(1, 'rgba(50,100,150,0)');  // 淡蓝色
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, size*0.15, 0, Math.PI*2);
+            ctx.fillStyle = horizonGradient;
+            ctx.fill();
+            
+            // 引力透镜效应粒子
+            const lensParticles = 500;
+            for(let i=0; i<lensParticles; i++) {
+                const angle = time*2 + i*0.02;
+                const dist = size*(0.2 + 0.6*Math.pow(i/lensParticles, 0.5));
+                const x = Math.cos(angle) * dist;
+                const y = Math.sin(angle) * dist;
+                
+                // 粒子受引力弯曲的轨迹
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(
+                    x*0.3, y*0.3,
+                    0, 0
+                );
+                ctx.strokeStyle = `hsla(${(200 + time*5 + i*0.3)%240},80%,80%,0.4)`;  // 调整为冷色调范围
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        // 模式4: DNA双螺旋3D视图(新版)
+        function drawCells() {
+            const centerX = canvas.width/2, centerY = canvas.height/2;
+            const size = Math.min(canvas.width, canvas.height)*1.1;
+            
+            time += 0.06;
+            rotation += 0.05;
+            
+            // 绘制黑洞背景
+            ctx.save();
+            const blackHoleGradient = ctx.createRadialGradient(
+                centerX, centerY, size*0.1,
+                centerX, centerY, size*0.5
+            );
+            blackHoleGradient.addColorStop(0, 'rgba(0,0,0,1)');
+            blackHoleGradient.addColorStop(0.7, 'rgba(20,0,40,0.8)');
+            blackHoleGradient.addColorStop(1, 'rgba(50,0,80,0)');
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, size*0.5, 0, Math.PI*2);
+            ctx.fillStyle = blackHoleGradient;
+            ctx.fill();
+            ctx.restore();
+            
+            // 初始化DNA链粒子
+            const dnaStrands = 2; // 两条DNA链
+            const particlesPerStrand = 150; // 每条链150个碱基对
+            const totalParticles = dnaStrands * particlesPerStrand;
+            
+            // 创建DNA粒子
+            const particles = Array(totalParticles).fill().map((_, index) => {
+                const strand = index % dnaStrands;
+                const basePair = Math.floor(index / dnaStrands);
+                
+                return {
+                    x: 0, y: 0, z: 0,
+                    size: 3 + Math.random()*2,
+                    angle: 0,
+                    speed: 0.02,
+                    strand: strand,
+                    basePair: basePair
+                };
+            });
+            
+            // 绘制DNA螺旋
+            particles.forEach((p, index) => {
+                // DNA螺旋参数 - 增大半径和高度
+                const spiralRadius = size * 0.4;  // 从0.3增大到0.4
+                const spiralHeight = size * 2.5;  // 从2.0增大到2.5
+                const twist = Math.PI * 12;  // 增加扭曲度
+                
+                // 计算3D位置
+                p.angle += p.speed;
+                const t = p.basePair / particlesPerStrand;
+                const angle = p.angle + t * twist + time*0.5;  // 加入时间因子
+                
+                // 两条链的位置计算
+                p.x = Math.cos(angle) * spiralRadius * (p.strand ? 1 : -1);
+                p.y = t * spiralHeight - spiralHeight/2;
+                p.z = Math.sin(angle) * spiralRadius;
+                
+                // 3D投影
+                const scale = size / (size + p.z);
+                const projX = centerX + p.x * scale;
+                const projY = centerY + p.y * scale;
+                
+                // 颜色计算
+                const hue = (time*15 + p.basePair*3) % 360;
+                const pulse = 0.6 + 0.4*Math.sin(time*4 + p.basePair*0.2);  // 增强脉动效果
+                
+                // 绘制碱基 - 增强颜色对比
+                const gradient = ctx.createRadialGradient(
+                    projX, projY, 0,
+                    projX, projY, p.size*pulse*scale
+                );
+                gradient.addColorStop(0, `hsla(${hue},100%,85%,0.9)`);  // 提高饱和度和亮度
+                gradient.addColorStop(0.7, `hsla(${(hue+180)%360},90%,60%,0.6)`);  // 使用互补色增强对比
+                gradient.addColorStop(1, `hsla(${(hue+120)%360},80%,40%,0.3)`);
+                
+                ctx.beginPath();
+                ctx.arc(projX, projY, p.size*pulse*scale, 0, Math.PI*2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // 绘制碱基对连接线
+                if(p.strand === 0) {
+                    const partner = particles[index + 1];
+                    if(partner) {
+                        const partnerScale = size / (size + partner.z);
+                        const partnerX = centerX + partner.x * partnerScale;
+                        const partnerY = centerY + partner.y * partnerScale;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(projX, projY);
+                        ctx.lineTo(partnerX, partnerY);
+                        ctx.strokeStyle = `hsla(${(hue+60)%360},70%,80%,0.5)`;
+                        ctx.lineWidth = 1.5;
+                        ctx.stroke();
+                    }
+                }
+                
+                // 绘制磷酸骨架
+                if(p.basePair > 0) {
+                    const prev = particles[index - dnaStrands];
+                    if(prev) {
+                        const prevScale = size / (size + prev.z);
+                        const prevX = centerX + prev.x * prevScale;
+                        const prevY = centerY + prev.y * prevScale;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(prevX, prevY);
+                        ctx.lineTo(projX, projY);
+                        ctx.strokeStyle = `hsla(${hue},50%,70%,0.7)`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            });
+            
+            ctx.restore();  // 恢复旋转状态
+            
+            // 绘制费马螺旋线
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            
+            const spiralPoints = 200;
+            const spiralSize = size * 0.6;
+            ctx.beginPath();
+            
+            for(let i=0; i<spiralPoints; i++) {
+                const t = i/spiralPoints;
+                // 费马螺旋公式: r = a√θ
+                const angle = t * Math.PI * 10;
+                const radius = spiralSize * Math.sqrt(t);
+                
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                if(i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.strokeStyle = `hsla(${(time*20)%360},80%,70%,0.6)`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+            
+            ctx.restore();  // 恢复旋转状态
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            switch(mode) {
+                case 1: drawQuantumFractal(); break;
+                case 2: drawNebula(); break;
+                case 3: drawBlackHoleKaleidoscope(); break;  // 替换为黑洞万花筒
+                case 4: drawCells(); break;
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => mode = +btn.dataset.mode);
+        });
+        
+        animate();
+    </script>
+</body>
+</html>

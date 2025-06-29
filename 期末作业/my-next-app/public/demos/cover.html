@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>封面页</title>
+    <style>
+        body {
+            background-image: url('https://th.bing.com/th/id/R.2a49d9f3677d83a9a2d8849f1442bb22?rik=DpSAj9AUyR4RrA&riu=http%3a%2f%2ffile.51pptmoban.com%2fd%2ffile%2f2023%2f06%2f04%2fb3925630992729172938c08655e5cfd0.jpg&ehk=avAdUGiVQ52VCb2qjEv6sors6E%2bzLS0DO4tv4hnl6aw%3d&risl=&pid=ImgRaw&r=0'), url('https://www.transparenttextures.com/patterns/black-thread.png');
+            background-size: cover, auto;
+            background-position: center, center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            animation: moveBackground 30s linear infinite; /* 添加背景动画 */
+        }
+
+        @keyframes moveBackground {
+            0% {
+                background-position: 0% 0%; /* 从顶部开始 */
+            }
+            100% {
+                background-position: 0% 100%; /* 移动到底部 */
+            }
+        }
+        .cover-title {
+            font-size: 60px;
+            font-family: "楷体", "KaiTi", serif;
+            color: white;
+            text-align: center;
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 20px;
+            border: 5px solid white;
+            border-radius: 20px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+        .pattern {
+            position: absolute;
+            width: 150px;
+            height: auto;
+            opacity: 0.8;
+        }
+        .pattern-top-left {
+            top: 20px;
+            left: 20px;
+        }
+        .pattern-top-right {
+            top: 20px;
+            right: 20px;
+            transform: scaleX(-1); /* 水平镜像 */
+        }
+        .pattern-bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+        .pattern-bottom-right {
+            bottom: 20px;
+            right: 20px;
+            transform: scaleX(-1); /* 水平镜像 */
+        }
+        
+        /* 新增土星样式 */
+        #saturn {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #d9a441;
+            border-radius: 50%;
+            box-shadow: 0 0 30px #d9a441;
+            z-index: 1;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+        }
+        
+        #saturn::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 40px;
+            background: transparent;
+            border: 4px solid #c19b3c;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(20deg);
+            box-shadow: 0 0 10px #c19b3c;
+        }
+
+        /* 调整标题样式 */
+        .cover-title {
+            font-size: 48px; /* 缩小字体 */
+            width: 70%; /* 限制宽度 */
+            margin: 0 auto; /* 居中 */
+        }
+    </style>
+</head>
+<body>
+    <img src="https://th.bing.com/th/id/R.0eced969a89da156f082166163a2a57c?rik=9k3oQHCBifZPDw&pid=ImgRaw&r=0" alt="图案1" class="pattern pattern-top-left">
+    <img src="https://th.bing.com/th/id/R.0eced969a89da156f082166163a2a57c?rik=9k3oQHCBifZPDw&pid=ImgRaw&r=0" alt="图案2" class="pattern pattern-top-right">
+    <img src="https://th.bing.com/th/id/R.0eced969a89da156f082166163a2a57c?rik=9k3oQHCBifZPDw&pid=ImgRaw&r=0" alt="图案3" class="pattern pattern-bottom-left">
+    <img src="https://th.bing.com/th/id/R.0eced969a89da156f082166163a2a57c?rik=9k3oQHCBifZPDw&pid=ImgRaw&r=0" alt="图案4" class="pattern pattern-bottom-right">
+    <!-- 新增土星元素 -->
+    <div id="saturn"></div>
+    
+    <div class="cover-title" onclick="window.location.href='01-css-0.3.html'">
+        点击进入kklhen史伟馨的课程作业展示
+    </div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金分割线模型</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            width: 800px;
+            height: 500px;
+            position: relative;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .golden-rectangle {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border: 1px solid #333;
+        }
+        
+        .line {
+            position: absolute;
+            background-color: rgba(218, 165, 32, 0.7);
+        }
+        
+        .vertical-line {
+            width: 2px;
+            height: 100%;
+            left: 61.8%;
+        }
+        
+        .horizontal-line {
+            width: 100%;
+            height: 2px;
+            top: 61.8%;
+        }
+        
+        .label {
+            position: absolute;
+            font-size: 14px;
+            color: #333;
+            background-color: rgba(255,255,255,0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .vertical-label {
+            top: 10px;
+            left: 61.8%;
+            transform: translateX(-50%);
+        }
+        
+        .horizontal-label {
+            left: 10px;
+            top: 61.8%;
+            transform: translateY(-50%);
+        }
+        
+        .phi {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: goldenrod;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="golden-rectangle">
+            <div class="line vertical-line"></div>
+            <div class="line horizontal-line"></div>
+            <div class="label vertical-label">61.8%</div>
+            <div class="label horizontal-label">61.8%</div>
+            <div class="phi">φ = 1.618</div>
+        </div>
+    </div>
+    
+    <script>
+        // 可以添加交互功能
+        const container = document.querySelector('.container');
+        const goldenRect = document.querySelector('.golden-rectangle');
+        
+        function updateSize() {
+            const width = container.clientWidth;
+            const goldenRatio = 1.618;
+            const height = width / goldenRatio;
+            container.style.height = `${height}px`;
+            
+            // 更新标签位置
+            const verticalLabel = document.querySelector('.vertical-label');
+            const horizontalLabel = document.querySelector('.horizontal-label');
+            
+            verticalLabel.style.left = `${width * 0.618}px`;
+            horizontalLabel.style.top = `${height * 0.618}px`;
+        }
+        
+        window.addEventListener('resize', updateSize);
+        updateSize();
+    </script>
+</body>
+</html>

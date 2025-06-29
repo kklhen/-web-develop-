@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>镜面碎片人脸</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .face-container {
+            position: relative;
+            width: 400px;
+            height: 500px;
+        }
+        .face-fragment {
+            position: absolute;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            transition: transform 0.5s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .face-fragment::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.3) 50%, 
+                rgba(255,255,255,0.1) 100%
+            );
+            mix-blend-mode: overlay;
+        }
+    </style>
+</head>
+<body>
+    <div class="face-container" id="faceContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('faceContainer');
+            const imgUrl = 'face-profile.jpg'; // 替换为您的侧脸图片路径
+            
+            // 碎片配置
+            const fragments = [
+                { x: 20, y: 15, w: 25, h: 20 }, // 额头区域
+                { x: 15, y: 35, w: 30, h: 25 }, // 眼部区域
+                { x: 10, y: 60, w: 35, h: 25 }, // 脸颊区域
+                { x: 5, y: 85, w: 40, h: 30 }  // 下巴区域
+            ];
+            
+            // 创建碎片
+            fragments.forEach((frag, index) => {
+                const fragment = document.createElement('div');
+                fragment.className = 'face-fragment';
+                
+                // 设置碎片位置和大小
+                fragment.style.left = `${frag.x}%`;
+                fragment.style.top = `${frag.y}%`;
+                fragment.style.width = `${frag.w}%`;
+                fragment.style.height = `${frag.h}%`;
+                
+                // 设置背景图片（每个碎片显示图片的不同部分）
+                fragment.style.backgroundImage = `url(${imgUrl})`;
+                fragment.style.backgroundPosition = `-${frag.x * 4}px -${frag.y * 5}px`;
+                
+                // 添加随机旋转和浮动效果
+                fragment.style.transform = `
+                    rotate(${(Math.random() - 0.5) * 5}deg)
+                    translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)
+                `;
+                
+                container.appendChild(fragment);
+                
+                // 添加悬停动画
+                fragment.addEventListener('mouseenter', () => {
+                    fragment.style.transform = `
+                        rotate(${(Math.random() - 0.5) * 15}deg)
+                        translate(${(Math.random() - 0.5) * 20}px, ${(Math.random() - 0.5) * 20}px)
+                        scale(1.05)
+                    `;
+                    fragment.style.boxShadow = '0 0 25px rgba(255,255,255,0.3)';
+                });
+                
+                fragment.addEventListener('mouseleave', () => {
+                    fragment.style.transform = `
+                        rotate(${(Math.random() - 0.5) * 5}deg)
+                        translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)
+                    `;
+                    fragment.style.boxShadow = '0 0 15px rgba(0,0,0,0.5)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的智能助手</title>
+    <!-- 引入外部CSS样式文件 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="interaction-notice">
+    <strong>💡 提示：</strong>您可以通过两种方式与智能助手交互：<br>
+    1. 使用下方的聊天界面直接对话<br>
+    2. 点击右下角的悬浮按钮打开QAnything智能体窗口
+</div>
+
+<div class="chat-container">
+    <div class="chat-header">QAnything 智能助手</div>
+    <div class="chat-messages" id="chatMessages">
+        <!-- 聊天消息将由JavaScript动态插入这里 -->
+    </div>
+    <form class="chat-input-form" id="chatForm">
+        <input type="text" id="userInput" placeholder="输入你的问题..." autocomplete="off">
+        <button type="submit" id="sendButton">➤</button>
+    </form>
+</div>
+
+<!-- 引入外部JavaScript逻辑文件 -->
+<script src="script.js"></script>
+
+<!-- QAnything 智能体 iframe 组件 -->
+<script 
+    src="https://ai.youdao.com/saas/qanything/js/agent-iframe-min.js" 
+    id="qanything-iframe" 
+    data-agent-src="https://ai.youdao.com/saas/qanything/#/bots/A728E8C44505434E/share" 
+    data-default-open="false" 
+    data-drag="false" 
+    data-open-icon="https://download.ydstatic.com/ead/icon-qanything-iframe-btn.png" 
+    data-close-icon="https://download.ydstatic.com/ead/icon-qanything-iframe-btn.png" 
+    defer 
+></script>
+
+</body>
+</html>

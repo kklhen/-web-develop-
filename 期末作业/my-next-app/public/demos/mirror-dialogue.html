@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>镜中对话</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        .poster {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(0,0,0,0.8) 100%);
+            filter: contrast(120%) brightness(90%);
+        }
+        .face-container {
+            position: absolute;
+            width: 60%;
+            height: 80%;
+            left: 20%;
+            top: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .face-fragment {
+            position: absolute;
+            border: 1px solid #333;
+            overflow: hidden;
+            background-size: cover;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .circuit-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, transparent 95%, #555 95%),
+                linear-gradient(0deg, transparent 95%, #555 95%);
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+        .hand {
+            position: absolute;
+            width: 200px;
+            height: 300px;
+            background: url('data:image/svg+xml;utf8,<svg>...</svg>') no-repeat;
+            animation: reach 3s ease-in-out infinite;
+            z-index: 10;
+        }
+        @keyframes reach {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-20px) translateY(-10px); }
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+            animation: ripple 2s ease-out infinite;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        .title {
+            position: absolute;
+            bottom: 15%;
+            width: 100%;
+            text-align: center;
+            color: transparent;
+            font-size: 3rem;
+            letter-spacing: 5px;
+            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 0 0 10px rgba(255,204,0,0.5);
+        }
+        .subtitle {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+        }
+        .micro-scene {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-size: cover;
+            opacity: 0.8;
+            animation: float 10s linear infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="poster">
+        <div class="background"></div>
+        
+        <div class="face-container" id="faceContainer">
+            <!-- 人脸碎片将通过JS动态生成 -->
+        </div>
+        
+        <div class="hand" id="hand"></div>
+        <div class="ripple" id="ripple"></div>
+        
+        <h1 class="title">镜中对话</h1>
+        <h2 class="subtitle">Every crack is a channel for light</h2>
+        
+        <!-- 微小碎片场景将通过JS动态生成 -->
+    </div>
+
+    <script>
+        // 使用requestAnimationFrame优化动画性能
+        function animate() {
+            requestAnimationFrame(animate);
+            // 动画逻辑可以放在这里
+        }
+        animate();
+
+        // 使用文档片段批量DOM操作
+        document.addEventListener('DOMContentLoaded', function() {
+            const faceContainer = document.getElementById('faceContainer');
+            const fragments = [
+                { x: 30, y: 20, w: 40, h: 30, emotion: 'anger' },
+                { x: 10, y: 50, w: 35, h: 40, emotion: 'sadness' },
+                { x: 45, y: 50, w: 35, h: 40, emotion: 'numb' }
+            ];
+            
+            const fragmentDoc = document.createDocumentFragment();
+            
+            fragments.forEach(frag => {
+                const fragment = document.createElement('div');
+                fragment.className = 'face-fragment';
+                fragment.style.left = `${frag.x}%`;
+                fragment.style.top = `${frag.y}%`;
+                fragment.style.width = `${frag.w}%`;
+                fragment.style.height = `${frag.h}%`;
+                fragment.style.backgroundImage = `url('emotion-${frag.emotion}.jpg')`;
+                
+                const circuit = document.createElement('div');
+                circuit.className = 'circuit-pattern';
+                fragment.appendChild(circuit);
+                
+                faceContainer.appendChild(fragment);
+            });
+            
+            // 设置手部动画
+            hand.style.left = `${faceContainer.offsetLeft + faceContainer.offsetWidth * 0.7}px`;
+            hand.style.top = `${faceContainer.offsetTop + faceContainer.offsetHeight * 0.5}px`;
+            
+            // 设置水波纹动画
+            ripple.style.left = `${hand.offsetLeft - 50}px`;
+            ripple.style.top = `${hand.offsetTop + 100}px`;
+            
+            // 创建微小碎片场景
+            for(let i = 0; i < 8; i++) {
+                const scene = document.createElement('div');
+                scene.className = 'micro-scene';
+                scene.style.left = `${Math.random() * 100}%`;
+                scene.style.top = `${70 + Math.random() * 20}%`;
+                scene.style.backgroundImage = `url('micro-scene-${i % 3}.jpg')`;
+                scene.style.animationDuration = `${8 + Math.random() * 10}s`;
+                document.body.appendChild(scene);
+            }
+        });
+
+        // 使用CSS变量统一管理颜色
+        const root = document.documentElement;
+        root.style.setProperty('--primary-color', '#ffcc00');
+        root.style.setProperty('--secondary-color', '#ff6600');
+
+        // 使用Intersection Observer实现懒加载
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 加载可见区域的资源
+                    entry.target.style.backgroundImage = `url(${entry.target.dataset.src})`;
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        // 对碎片元素应用懒加载
+        document.querySelectorAll('.face-fragment').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
