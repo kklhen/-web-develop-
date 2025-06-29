@@ -26,6 +26,7 @@
   - API代理服务
   - 健康检查和监控
 - **亮点**: 前后端分离架构，AI技术集成
+- <img src=""C:\Users\x1021\Pictures\Screenshots\屏幕截图 2025-06-29 225213.png"" alt="图片描述">
 
 #### 3. **my-wakatime-worker** - Cloudflare Workers应用
 - **技术栈**: Cloudflare Workers + Vitest
