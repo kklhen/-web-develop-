@@ -53,7 +53,7 @@
 
 ### AI & 集成
 - **AI服务**: QAnything智能问答
-- **数据源**: GitHub API, Wakatime API
+- **数据源**: GitHub API, Wakatime API，QanythingAPI,BOTID
 - **部署**: Vercel, Cloudflare
 
 ## 🌟 功能亮点
