@@ -17,6 +17,7 @@
   - GitHub统计数据展示
   - 多种演示页面（计数器、聊天、数据可视化）
 - **亮点**: 现代化UI设计，完整的用户交互体验
+- ![首页预览](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-30%20153911.png?raw=true))
 - ![展示](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-29%20230728.png)
 - ![图片描述](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-29%20230743.png)
 
@@ -30,6 +31,8 @@
 - **亮点**: 前后端分离架构，AI技术集成
 - #### QAnything运行截图
 ![图片描述]( https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-29%20224728.png)
+![图片描述](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-30%20154233.png)
+
 *QAnything智能助手运行界面 - 展示新闻学专业智能问答功能*
 
  
@@ -41,7 +44,7 @@
   - 全球CDN分发
   - 单元测试覆盖
 - **亮点**: 现代化无服务器架构，全球部署
-- ![wanketime](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-29%20230541.png))
+- ![wanketime](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-29%20230541.png)
 
 
 ## 🛠️ 技术栈总览
@@ -79,6 +82,8 @@
 - **GitHub统计**: 个人GitHub数据展示
 - **Wakatime统计**: 编程时间和语言分布
 - **实时更新**: 通过API获取最新数据
+- ![wanketime](https://github.com/kklhen/images/blob/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202025-06-29%20230833.png?raw=true)
+- 
 
 ### 🎨 创意展示
 - **万花筒动画**: 纯CSS实现的复杂动画效果
@@ -171,6 +176,8 @@ npm run deploy
 - **主应用**: [Next.js应用演示](http://localhost:3001)
 - **练习页面**: [技术卡片展示](http://localhost:3001/practice)
 - **GitHub统计**: [数据可视化](http://localhost:3001/github-stats)
+
+
 
 ## 📝 开发日志
 
