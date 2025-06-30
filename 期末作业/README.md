@@ -26,7 +26,6 @@
   - API代理服务
   - 健康检查和监控
 - **亮点**: 前后端分离架构，AI技术集成
-- <img src=""C:\Users\x1021\Pictures\Screenshots\屏幕截图 2025-06-29 225213.png"" alt="图片描述">
 
 #### 3. **my-wakatime-worker** - Cloudflare Workers应用
 - **技术栈**: Cloudflare Workers + Vitest
@@ -67,6 +66,10 @@
 - **QAnything集成**: 专业的新闻学智能助手
 - **多种集成方式**: 浮动窗口、iframe嵌入、脚本集成
 - **实时对话**: 支持连续对话和上下文理解
+
+#### QAnything运行截图
+![QAnything智能助手运行界面](./screenshots/qanything-demo.png)
+*QAnything智能助手运行界面 - 展示新闻学专业智能问答功能*
 
 ### 📊 数据可视化
 - **GitHub统计**: 个人GitHub数据展示
